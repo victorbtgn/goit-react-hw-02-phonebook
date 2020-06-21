@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Container from './Components/Container';
+import ContactForm from './Components/ContactForm';
+import Filter from './Components/Filter';
+import ContactList from './Components/ContactList';
+import Section from './Components/Section';
+import './App.css';
 
 class App extends Component {
   state = {
-    contacts: [],
-    name: '',
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '4591256' },
+      { id: 'id-2', name: 'Hermione Kline', number: '4438912' },
+      { id: 'id-3', name: 'Eden Clements', number: '6451779' },
+      { id: 'id-4', name: 'Annie Copeland', number: '2279126' },
+    ],
+    filter: '',
   };
 
   inputChange = evt => {
@@ -13,47 +23,53 @@ class App extends Component {
     this.setState({ [name]: value });
   };
 
-  addContact = evt => {
-    evt.preventDefault();
+  addContact = ({ name, number }) => {
+    if (this.state.contacts.find(contact => contact.name.includes(name))) {
+      alert(`${name} is already in contacts.`);
+      return;
+    }
 
     const contact = {
       id: uuidv4(),
-      name: this.state.name,
+      name: name,
+      number: number,
     };
 
     this.setState(({ contacts }) => ({
       contacts: [contact, ...contacts],
     }));
-
-    this.reset();
   };
 
-  reset = () => {
-    this.setState({ name: '' });
+  deleteContact = id => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id),
+    }));
   };
 
   render() {
+    const { contacts, filter } = this.state;
+    const toLowerFilter = filter.toLowerCase();
+    const visibleContacts = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(toLowerFilter),
+    );
+
     return (
       <Container>
-        <h2>Phonebook</h2>
-        <form onSubmit={this.addContact}>
-          <input
-            type="text"
-            name="name"
-            value={this.state.name}
-            placeholder="Name"
+        <Section title="Phonebook">
+          <ContactForm onSubmit={this.addContact} onChange={this.inputChange} />
+        </Section>
+
+        <Section title="Contacts">
+          <Filter
+            filter={filter}
+            contactsLength={contacts.length}
             onChange={this.inputChange}
           />
-          <br />
-          <button type="submit">Add contact</button>
-        </form>
-
-        <h2>Contacts</h2>
-        <ul>
-          {this.state.contacts.map(contact => (
-            <li key={contact.id}>{contact.name}</li>
-          ))}
-        </ul>
+          <ContactList
+            contacts={visibleContacts}
+            onDelete={this.deleteContact}
+          />
+        </Section>
       </Container>
     );
   }
