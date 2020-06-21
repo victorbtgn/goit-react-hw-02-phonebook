@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const Filter = ({ filter, contactsLength, onChange }) => (
   <>
@@ -18,5 +19,11 @@ const Filter = ({ filter, contactsLength, onChange }) => (
     )}
   </>
 );
+
+Filter.propTypes = {
+  filter: PropTypes.string.isRequired,
+  contactsLength: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default Filter;
