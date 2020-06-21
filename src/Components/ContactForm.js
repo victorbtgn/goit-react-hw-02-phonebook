@@ -47,8 +47,7 @@ class ContactForm extends Component {
           <br />
           <input
             type="tel"
-            minLength="7"
-            maxLength="7"
+            pattern="[0-9]{7}"
             name="number"
             value={number}
             className="input"
