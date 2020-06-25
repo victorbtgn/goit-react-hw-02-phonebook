@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Container from './Components/Container';
-import ContactForm from './Components/ContactForm';
-import Filter from './Components/Filter';
-import ContactList from './Components/ContactList';
-import Section from './Components/Section';
+import Container from './Common/Container';
+import ContactForm from './Components/ContactForm/ContactForm';
+import Filter from './Components/Filter/Filter';
+import ContactList from './Components/Contacts/ContactList';
+import Section from './Common/Section';
+import toaster from 'toasted-notes';
+import 'toasted-notes/src/styles.css';
 import './App.css';
 
 class App extends Component {
@@ -24,20 +26,29 @@ class App extends Component {
   };
 
   addContact = ({ name, number }) => {
-    if (this.state.contacts.find(contact => contact.name.includes(name))) {
-      alert(`${name} is already in contacts.`);
-      return;
+    const { contacts } = this.state;
+
+    const isExist = contacts.find(contact => contact.name === name);
+
+    if (isExist) {
+      toaster.notify(`${name} is already in contacts.`, {
+        duration: 5000,
+      });
+    } else if (!name || !number) {
+      toaster.notify('Please fill the form', {
+        duration: 5000,
+      });
+    } else {
+      const contact = {
+        id: uuidv4(),
+        name: name,
+        number: number,
+      };
+
+      this.setState(({ contacts }) => ({
+        contacts: [contact, ...contacts],
+      }));
     }
-
-    const contact = {
-      id: uuidv4(),
-      name: name,
-      number: number,
-    };
-
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts],
-    }));
   };
 
   deleteContact = id => {
